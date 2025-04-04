@@ -1,0 +1,66 @@
+@page "/register/{EventId:int}"
+
+@inject AttendanceTrackerService AttendanceTracker
+@inject NavigationManager NavigationManager
+
+<PageTitle>Register for Event</PageTitle>
+
+<h1>Register for Event</h1>
+
+@if (eventDetails == null)
+{
+    <p><em>Loading event details...</em></p>
+}
+else
+{
+    <div class="event-registration">
+        <h2>@eventDetails.Name</h2>
+        <p><strong>Date:</strong> @eventDetails.Date.ToString("MMMM dd, yyyy")</p>
+        <p><strong>Location:</strong> @eventDetails.Location</p>
+        <p><strong>Description:</strong> @eventDetails.Description</p>
+
+        <form @onsubmit="RegisterAttendance">
+            <div>
+                <label for="name">Name:</label>
+                <input id="name" @bind="participantName" type="text" placeholder="Enter your name" required />
+            </div>
+            <button type="submit" class="btn btn-primary">Register</button>
+        </form>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int EventId { get; set; }
+
+    private EventModel? eventDetails;
+    private string participantName = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Simulate fetching event details (replace with actual API call)
+        await Task.Delay(1000);
+
+        // Load event details based on EventId
+        eventDetails = LoadEventDetails(EventId);
+    }
+
+    private void RegisterAttendance()
+    {
+        AttendanceTracker.RegisterAttendance(EventId, participantName);
+        NavigationManager.NavigateTo($"/event-details/{EventId}");
+    }
+
+    private EventModel? LoadEventDetails(int eventId)
+    {
+        // Replace this with actual data fetching logic
+        var sampleEvents = new List<EventModel>
+        {
+            new EventModel { Id = 1, Name = "Tech Conference", Date = new DateTime(2025, 10, 12), Location = "New York", Description = "A conference about the latest in tech." },
+            new EventModel { Id = 2, Name = "Art Exhibition", Date = new DateTime(2025, 11, 5), Location = "Los Angeles", Description = "An exhibition showcasing modern art." },
+            new EventModel { Id = 3, Name = "Music Festival", Date = new DateTime(2025, 12, 20), Location = "Chicago", Description = "A festival featuring various music genres." },
+        };
+
+        return sampleEvents.FirstOrDefault(e => e.Id == eventId);
+    }
+}

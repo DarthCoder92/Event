@@ -1,0 +1,63 @@
+﻿@page "/" // This directive makes the page routeable at root URL
+
+@inject UserSessionService UserSession
+@inject NavigationManager NavigationManager
+
+<PageTitle>Upcoming Events - EventEase</PageTitle>
+
+<h1>Welcome, @UserSession.UserName!</h1>
+<p>Session started at: @UserSession.SessionStartTime</p>
+
+@if (events == null)
+{
+    <p><em>Loading events...</em></p> /* show loading message while fetching data */
+}
+else if (!events.Any())
+{
+    <p><em>No events available. Check back later!</em></p> /* show message if no events are available */
+}
+else
+{
+    <Virtualize Items="events" Context="ev">
+    <div class="event-item">
+        <NavLink class="btn btn-link" href="@($"/event-details/{ev.Id}")">@ev.Name</NavLink>
+    </div>
+</Virtualize>   
+}
+
+<button class="btn btn-danger" @onclick="EndSession">Logout</button>
+
+@code {
+    private List<EventModel>? events; // Nullable List to hold event data
+    private string pageTitle = "Home"; // Page title for the component
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Start the user session
+        UserSession.StartSession("Hanun");
+
+        // Simulate fetching data (replace with actual API call later)
+        await Task.Delay(2000); // Simulate a delay for data fetching
+
+        LoadSampleEvents(); // Load sample events for demonstration
+
+        // Update page title if needed based on data
+        pageTitle = "Upcoming Events";
+    }
+
+    private void LoadSampleEvents()
+    {
+        // In a real app, fetch this data from a service or an API
+        events = new List<EventModel> {
+            new EventModel { Id = 1, Name = "Tech Conference", Date = new DateTime(2025, 10, 12), Location = "New York", Description = "A conference about the latest in tech." },
+            new EventModel { Id = 2, Name = "Art Exhibition", Date = new DateTime(2025, 11, 5), Location = "Los Angeles", Description = "An exhibition showcasing modern art." },
+            new EventModel { Id = 3, Name = "Music Festival", Date = new DateTime(2025, 12, 20), Location = "Chicago", Description = "A festival featuring various music genres." },
+        };
+    }
+
+    private void EndSession()
+    {
+        UserSession.EndSession();
+        NavigationManager.NavigateTo("/");
+    }
+}

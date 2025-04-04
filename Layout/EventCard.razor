@@ -1,0 +1,30 @@
+// Shared/EventCard.razor
+@using EventEase.Models // Import the namespace for EventModel
+
+<div class="event-card">
+    <h4>@Event.Name</h4>
+    <p><strong>Date:</strong> @Event.Date.ToShortDateString()</p>
+    <p><strong>Location:</strong> @Event.Location</p>
+    <p>@Event.Description</p>
+    @* Add a link to event details later if needed
+       <a href="/eventdetails/@Event.Id">View Details</a>
+    *@
+</div>
+
+@code {
+    [Parameter]
+    public EventModel Event { get; set; } = new(); // Initialize to avoid null reference issues before parameter is set
+
+    protected override void OnInitialized()
+    {
+        // Basic validation or logging if needed
+        if (Event == null)
+        {
+            // Handle the case where the event data isn't provided,
+            // though initializing helps prevent this.
+            // Log error, show placeholder, etc.
+            Console.WriteLine("Error: Event parameter is null in EventCard.");
+            Event = new EventModel { Name = "Event data missing" }; // Provide default fallback
+        }
+    }
+}
